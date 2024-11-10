@@ -7,7 +7,7 @@ console.error("Logs from your program will appear here!");
 const gitClient = new GitClient()
 
 //commands
-const CatFilesCommand = require('./git/commands/index')
+const CatFilesCommand = require('./git/commands/cat-file')
 
 
 
@@ -20,6 +20,7 @@ switch (command) {
     break;
   case "cat-file" : 
     handleCatFileCommand()
+    break;
   default:
     throw new Error(`Unknown command ${command}`);
 }

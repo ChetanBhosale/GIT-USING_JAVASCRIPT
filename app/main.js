@@ -1,25 +1,31 @@
 const fs = require("fs");
 const path = require("path");
-const GitClient = require('./git/clients')
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-console.error("Logs from your program will appear here!");
+const GitClient = require('./git/clients');
 
-const gitClient = new GitClient()
+const gitClient = new GitClient();
 
-//commands
-const CatFilesCommand = require('./git/commands/cat-file')
+const CatFilesCommand = require('./git/commands/cat-file');
+const HashObjectCommand = require('./git/commands/hash-object');
+const handleLsTreeCommand = require('./git/commands/ls-tree');
+const commitTreeCommand = require('./git/commands/commit');
 
-
-
-// Uncomment this block to pass the first stage
 const command = process.argv[2];
 
 switch (command) {
   case "init":
     createGitDirectory();
     break;
-  case "cat-file" : 
-    handleCatFileCommand()
+  case "cat-file":
+    handleCatFileCommand();
+    break;
+  case "hash-object":
+    handleHashObjectCommand();
+    break;
+  case "ls-tree":
+    handleTreeCommand();
+    break;
+  case "commit":
+    handleCommitCode();
     break;
   default:
     throw new Error(`Unknown command ${command}`);
@@ -34,13 +40,41 @@ function createGitDirectory() {
   console.log("Initialized git directory");
 }
 
+function handleCatFileCommand() {
+  const flag = process.argv[3];
+  const commitSHA = process.argv[4];
 
-function handleCatFileCommand(){
-    const flag = process.argv[3];
-    const commitSHA = process.argv[4]
+  const command = new CatFilesCommand(flag, commitSHA);
+  gitClient.run(command);
+}
 
-    const command = new CatFilesCommand(flag,commitSHA);
-    gitClient.run(command)
-    
-    console.log({flag, commitSHA})
+function handleHashObjectCommand() {
+  let flag = process.argv[3];
+  let filePath = process.argv[4];
+
+  const hashCommand = new HashObjectCommand(flag, filePath);
+  gitClient.run(hashCommand);
+}
+
+function handleTreeCommand() {
+  let flag = process.argv[3];
+  let sha = process.argv[4];
+  if (!sha && flag === '--name-only') return;
+
+  if (!sha) {
+    sha = flag;
+    flag = null;
+  }
+
+  const command = new handleLsTreeCommand(flag, sha);
+  gitClient.run(command);
+}
+
+function handleCommitCode() {
+  const tree = process.argv[3];
+  const commitSHA = process.argv[5];
+  const commitMessage = process.argv[7];
+
+  const exec = new commitTreeCommand(tree, commitSHA, commitMessage);
+  gitClient.run(exec);
 }

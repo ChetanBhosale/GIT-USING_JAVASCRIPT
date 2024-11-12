@@ -1,7 +1,7 @@
 class GitClient {
-    run(command){
-        command.execute()
+    run(command) {
+      command.execute();
     }
-}
-
-module.exports = GitClient
+  }
+  
+  module.exports = GitClient;
